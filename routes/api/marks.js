@@ -10,14 +10,14 @@ router.get("/:roll", async (req, res) => {
   const obj = await Student.findOne({ roll: req.params.roll }).populate(
     "marks"
   );
-  if(obj == null){
-    res.status(400).end("student not found")
-    return
+  if (obj == null) {
+    res.status(400).end("student not found");
+    return;
   }
   const inMarks = await Marks.findOne({ student: obj });
-  if(inMarks == null){
-    res.status(400).send("marks not submitted yet for the student")
-    return 
+  if (inMarks == null) {
+    res.status(400).send("marks not submitted yet for the student");
+    return;
   }
   // console.log(typeof(obj.marks))
   // const data = {
@@ -42,15 +42,15 @@ router.post("/:roll", async (req, res) => {
   } else {
     let arr = [];
     Object.entries(req.body).forEach((item) => {
-      const obj = {}
-      obj[item[0]] = item[1]
-      arr.push(obj)
+      const obj = {};
+      obj[item[0]] = item[1];
+      arr.push(obj);
     });
     const data = {
       student: student,
-      marks: arr
+      marks: arr,
     };
-    
+
     const isInMarks = await Marks.findOne({ student: student._id });
     if (isInMarks == null) {
       const newMark = new Marks(data);
@@ -70,18 +70,16 @@ router.post("/:roll", async (req, res) => {
   }
 });
 
-router.patch('/:roll', async (req, res) => {
+router.patch("/:roll", async (req, res) => {
   const studentId = await Student.findOne({ roll: req.params.roll });
   const up = await Marks.findOne({ student: studentId });
   if (studentId == null) {
     res.status(200).send("this student not exist");
-    return
-  }
-  else if(up == null){
+    return;
+  } else if (up == null) {
     res.status(200).send("marks for this student is not submitted yet");
-    return 
-  } 
-  else {
+    return;
+  } else {
     await Marks.updateOne(
       { student: studentId },
       { $push: { marks: { $each: [req.body] } } }
@@ -90,6 +88,6 @@ router.patch('/:roll', async (req, res) => {
   }
   const upp = await Marks.findOne({ student: studentId });
   res.status(200).send(upp.marks);
-})
+});
 
 module.exports = router;
